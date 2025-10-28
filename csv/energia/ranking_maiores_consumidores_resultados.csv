@@ -1,0 +1,9 @@
+Cenário,Parâmetros,Status Esperado,Status Real,Tempo Médio (s),Tempo Mínimo (s),Tempo Máximo (s),Sucesso
+Top 10 padrão,{'top_n': 10},200,200,0.768,0.712,0.874,OK
+Top 5 mínimo,{'top_n': 5},200,200,0.724,0.7,0.756,OK
+Intervalo 3 dias,"{'data_inicio': '2025-10-25', 'data_fim': '2025-10-28', 'top_n': 10}",200,200,0.304,0.296,0.317,OK
+Intervalo 15 dias,"{'data_inicio': '2025-10-13', 'data_fim': '2025-10-28', 'top_n': 10}",200,200,0.304,0.295,0.312,OK
+Top_n abaixo do mínimo (1),{'top_n': 1},422,200,0.818,0.818,0.818,FALHA
+Top_n acima do máximo (100),{'top_n': 100},422,422,0.298,0.292,0.306,OK
+Datas invertidas,"{'data_inicio': '2025-10-28', 'data_fim': '2025-10-13', 'top_n': 10}",422,200,0.305,0.305,0.305,FALHA
+Top_n inválido (string),{'top_n': 'dez'},422,422,0.303,0.291,0.322,OK

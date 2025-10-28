@@ -1,0 +1,6 @@
+Cenário,Parâmetros,Status Esperado,Status Real,Tempo Médio (s),Tempo Mínimo (s),Tempo Máximo (s),Sucesso
+"Sem medidor_ids, gravidade_min baixa","{'gravidade_min': 'baixa', 'limit': 50}",200,200,0.314,0.284,0.427,OK
+"Sem medidor_ids, gravidade_min média","{'gravidade_min': 'media', 'limit': 50}",200,200,0.286,0.279,0.29,OK
+"Sem medidor_ids, gravidade_min alta","{'gravidade_min': 'alta', 'limit': 50}",200,200,0.284,0.28,0.293,OK
+"Medidor 11, gravidade_min baixa","{'medidor_ids': [120], 'gravidade_min': 'baixa', 'limit': 50}",200,200,0.308,0.3,0.316,OK
+Gravidade inválida,"{'gravidade_min': 'muito_alta', 'limit': 50}",422,422,0.292,0.282,0.3,OK

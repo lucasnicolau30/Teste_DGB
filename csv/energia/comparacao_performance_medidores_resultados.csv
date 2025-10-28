@@ -1,0 +1,8 @@
+Cenário,Parâmetros,Status Esperado,Status Real,Tempo Médio (s),Tempo Mínimo (s),Tempo Máximo (s),Sucesso
+Sem parâmetros,{},200,200,0.96,0.897,1.107,OK
+Limit 10,{'limit': 10},200,200,0.953,0.901,1.051,OK
+Limit 100000,{'limit': 100000},200,200,0.918,0.881,0.986,OK
+Intervalo 3 dias,"{'data_inicio': '2025-10-25', 'data_fim': '2025-10-28'}",200,200,0.303,0.292,0.312,OK
+Apenas data_inicio,{'data_inicio': '2025-10-18'},200,200,0.319,0.306,0.334,OK
+Apenas data_fim,{'data_fim': '2025-10-28'},200,200,0.961,0.927,0.995,OK
+Datas invertidas,"{'data_inicio': '2025-10-28', 'data_fim': '2025-10-18'}",422,200,0.317,0.317,0.317,FALHA

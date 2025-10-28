@@ -1,0 +1,2 @@
+Cenário,Parâmetros,Status Esperado,Status Real,Tempo Médio (s),Tempo Mínimo (s),Tempo Máximo (s),Sucesso
+Sem parâmetros,{},200,200,0.717,0.663,0.84,OK

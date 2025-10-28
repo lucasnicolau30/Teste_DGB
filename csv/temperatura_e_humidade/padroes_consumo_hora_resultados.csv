@@ -1,0 +1,4 @@
+Cenário,Parâmetros,Status Esperado,Status Real,Tempo Médio (s),Tempo Mínimo (s),Tempo Máximo (s),Sucesso
+Sem tipo_sensor,{},200,200,0.336,0.311,0.423,OK
+Tipo_sensor temperatura,{'tipo_sensor': 'temperatura'},200,200,0.304,0.297,0.322,OK
+Tipo_sensor inválido,{'tipo_sensor': 'invalido'},422,200,0.294,0.294,0.294,FALHA

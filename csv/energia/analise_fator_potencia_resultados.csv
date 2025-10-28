@@ -1,0 +1,11 @@
+Cenário,Parâmetros,Status Esperado,Status Real,Tempo Médio (s),Tempo Mínimo (s),Tempo Máximo (s),Sucesso
+Sem parâmetros,{},200,200,0.681,0.647,0.793,OK
+Limit 10,{'limit': 10},200,200,0.671,0.636,0.706,OK
+Limit 100000,{'limit': 100000},200,200,0.641,0.62,0.665,OK
+Intervalo 3 dias,"{'data_inicio': '2025-10-25', 'data_fim': '2025-10-28'}",200,200,0.671,0.636,0.711,OK
+Apenas data_inicio,{'data_inicio': '2025-10-18'},200,200,0.657,0.634,0.69,OK
+Apenas data_fim,{'data_fim': '2025-10-28'},200,200,0.654,0.632,0.715,OK
+Lista curta de medidores,"{'medidor_ids': [123, 120, 67, 64]}",200,200,0.576,0.554,0.608,OK
+Lista longa de medidores,"{'medidor_ids': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50]}",200,200,0.401,0.399,0.404,OK
+Medidores inválidos,"{'medidor_ids': ['a', 'b', 'c']}",422,422,0.291,0.28,0.309,OK
+Datas invertidas,"{'data_inicio': '2025-10-28', 'data_fim': '2025-10-18'}",422,200,0.682,0.682,0.682,FALHA

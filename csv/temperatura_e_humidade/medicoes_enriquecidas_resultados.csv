@@ -1,0 +1,16 @@
+Cenário,Parâmetros,Status Esperado,Status Real,Tempo Médio (s),Tempo Mínimo (s),Tempo Máximo (s),Sucesso
+Sem parâmetros,{},200,200,0.336,0.307,0.425,OK
+Tipo sensor AMBIENTE,{'tipo_sensor': 'AMBIENTE'},200,200,0.316,0.303,0.337,OK
+Tipo sensor FREEZER,{'tipo_sensor': 'FREEZER'},200,200,0.282,0.271,0.287,OK
+Apenas data_inicio,{'data_inicio': '2025-10-18T11:16:02.448760'},200,200,0.307,0.296,0.312,OK
+Apenas data_fim,{'data_fim': '2025-10-28T11:16:02.448760'},200,200,0.308,0.299,0.315,OK
+Intervalo de 3 dias,"{'data_inicio': '2025-10-25T11:16:02.448760', 'data_fim': '2025-10-28T11:16:02.448760'}",200,200,0.304,0.297,0.312,OK
+Limit 10,{'limit': 10},200,200,0.325,0.321,0.328,OK
+Limit 1000,{'limit': 1000},200,200,0.692,0.52,0.9,OK
+Apenas anomalias,{'apenas_anomalias': True},200,200,0.292,0.2,0.329,OK
+Lista curta de medidores,"{'medidor_ids': [123, 120, 67, 64]}",200,200,0.319,0.298,0.336,OK
+Limit 20 + Offset 5,"{'limit': 20, 'offset': 5}",200,200,0.279,0.273,0.291,OK
+Cenário completo,"{'tipo_sensor': 'AMBIENTE', 'data_inicio': '2025-10-25T11:16:02.448760', 'data_fim': '2025-10-28T11:16:02.448760', 'apenas_anomalias': False, 'limit': 50, 'offset': 0, 'medidor_ids': [123, 120, 67, 64]}",200,200,0.31,0.3,0.316,OK
+Tipo sensor inválido,{'tipo_sensor': 'INVALIDO'},422,200,0.294,0.294,0.294,FALHA
+Datas invertidas,"{'data_inicio': '2025-10-28T11:16:02.448760', 'data_fim': '2025-10-18T11:16:02.448760'}",422,200,0.298,0.298,0.298,FALHA
+Medidores inválidos,"{'medidor_ids': ['a', 'b', 'c']}",422,422,0.292,0.282,0.3,OK
