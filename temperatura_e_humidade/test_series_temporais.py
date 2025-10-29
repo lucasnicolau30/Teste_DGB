@@ -5,7 +5,7 @@ import csv
 from datetime import datetime
 
 # ===============================================================
-# 🔧 CONFIGURAÇÕES GERAIS
+# CONFIGURAÇÕES GERAIS
 # ===============================================================
 BASE_URL = "http://172.16.40.100:8025/analise_medidores_temp_hum/series-temporais-hora"
 HEADERS = {"accept": "application/json"}
@@ -14,7 +14,7 @@ ARQUIVO_CSV = "csv/temperatura_e_humidade/series_temporais_hora_resultados.csv"
 LIMITE_TEMPO_MEDIO = 30  # segundos
 
 # ===============================================================
-# 🧰 FIXTURE HTTP SESSION
+# FIXTURE HTTP SESSION
 # ===============================================================
 @pytest.fixture(scope="session")
 def session():
@@ -24,28 +24,28 @@ def session():
     s.close()
 
 # ===============================================================
-# ⚙️ CENÁRIOS DE TESTE
+# CENÁRIOS DE TESTE
 # ===============================================================
 cenarios = [
-    # ✅ Cenário 1 - Sem medidor_ids, limite 100
+    # Cenário 1 - Sem medidor_ids, limite 100
     ({"limit": 100}, "Sem medidor_ids, limit 100", 200),
 
-    # ✅ Cenário 2 - Medidor específico
+    # Cenário 2 - Medidor específico
     ({"medidor_ids": [2], "limit": 50}, "Medidor 2, limit 50", 200),
 
-    # ✅ Cenário 3 - Vários medidores
+    # Cenário 3 - Vários medidores
     ({"medidor_ids": [123, 120, 67, 64], "limit": 50}, "Medidores 2 e 3, limit 50", 200),
 
-    # ✅ Cenário 4 - Data de início e fim
+    # Cenário 4 - Data de início e fim
     ({"data_inicio": "2025-07-24T00:00:00", "data_fim": "2025-07-24T23:59:59", "limit": 50},
     "Intervalo de data, limit 50", 200),
 
-    # ❌ Cenário 5 - Limit inválido
+    # Cenário 5 - Limit inválido
     ({"limit": -1}, "Limit inválido", 422),
 ]
 
 # ===============================================================
-# 📊 CRIA/INICIALIZA O CSV
+# CRIA/INICIALIZA O CSV
 # ===============================================================
 with open(ARQUIVO_CSV, "w", newline="", encoding="utf-8") as csvfile:
     writer = csv.writer(csvfile)
@@ -61,7 +61,7 @@ with open(ARQUIVO_CSV, "w", newline="", encoding="utf-8") as csvfile:
     ])
 
 # ===============================================================
-# 🧪 TESTE PARAMETRIZADO
+# TESTE PARAMETRIZADO
 # ===============================================================
 @pytest.mark.parametrize("params, descricao, status_esperado", cenarios, ids=[d for _, d, _ in cenarios])
 def test_series_temporais_hora(session, params, descricao, status_esperado):
@@ -87,7 +87,7 @@ def test_series_temporais_hora(session, params, descricao, status_esperado):
             print(f"❌ Status inesperado: {status_real}, esperado: {status_esperado}")
             break
 
-        # ✅ Se retorno for 200, valida estrutura JSON
+        # Se retorno for 200, valida estrutura JSON
         if status_real == 200:
             data = resp.json()
             assert isinstance(data, list), f"Retorno esperado: lista, recebido: {type(data)}"
@@ -110,7 +110,7 @@ def test_series_temporais_hora(session, params, descricao, status_esperado):
                 for campo in campos_esperados:
                     assert campo in item, f"Campo ausente: {campo}"
 
-                # ✅ Tipos básicos
+                # Tipos básicos
                 assert isinstance(item["medidor_id"], int)
                 assert isinstance(item["medidor_descricao"], str)
                 assert isinstance(item["data_hora"], str)
@@ -123,7 +123,7 @@ def test_series_temporais_hora(session, params, descricao, status_esperado):
                 assert isinstance(item["total_anomalias"], int)
 
     # ===============================================================
-    # 📊 Estatísticas de tempo
+    # Estatísticas de tempo
     # ===============================================================
     media = sum(tempos) / len(tempos)
     menor = min(tempos)
@@ -135,7 +135,7 @@ def test_series_temporais_hora(session, params, descricao, status_esperado):
     print(f"  Média: {media:.3f}s | Mínimo: {menor:.3f}s | Máximo: {maior:.3f}s")
 
     # ===============================================================
-    # 💾 Salva no CSV
+    # Salva no CSV
     # ===============================================================
     with open(ARQUIVO_CSV, "a", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
@@ -151,7 +151,7 @@ def test_series_temporais_hora(session, params, descricao, status_esperado):
         ])
 
     # ===============================================================
-    # ⏱️ Verifica tempo médio
+    # Verifica tempo médio
     # ===============================================================
     if status_esperado == 200:
         assert media < LIMITE_TEMPO_MEDIO, f"Tempo médio alto ({media:.2f}s) em {descricao}"

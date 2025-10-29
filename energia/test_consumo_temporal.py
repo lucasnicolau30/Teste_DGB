@@ -5,7 +5,7 @@ import csv
 from datetime import date, timedelta
 
 # ===============================================================
-# 🔧 CONFIGURAÇÕES GERAIS
+# CONFIGURAÇÕES GERAIS
 # ===============================================================
 BASE_URL = "http://172.16.40.100:8025/analise_energia/consumo-temporal" 
 HEADERS = {"accept": "application/json"}
@@ -14,7 +14,7 @@ ARQUIVO_CSV = "csv/energia/consumo_temporal_resultados.csv"
 LIMITE_TEMPO_MEDIO = 30  # segundos
 
 # ===============================================================
-# 🧰 FIXTURE HTTP SESSION
+# FIXTURE HTTP SESSION
 # ===============================================================
 @pytest.fixture(scope="session")
 def session():
@@ -24,58 +24,58 @@ def session():
     s.close()
 
 # ===============================================================
-# ⚙️ CENÁRIOS DE TESTE
+# CENÁRIOS DE TESTE
 # ===============================================================
 hoje = date.today()
 tres_dias_atras = (hoje - timedelta(days=3)).isoformat()
 dez_dias_atras = (hoje - timedelta(days=10)).isoformat()
 
 cenarios = [
-    # ✅ Cenário 1 - padrão (sem parâmetros)
+    # Cenário 1 - padrão (sem parâmetros)
     ({}, "Sem parâmetros", 200),
 
-    # ✅ Cenário 2 - limit pequeno
+    # Cenário 2 - limit pequeno
     ({"limit": 10}, "Limit 10", 200),
 
-    # ✅ Cenário 3 - limit grande
+    # Cenário 3 - limit grande
     ({"limit": 100000}, "Limit 100000", 200),
 
-    # ✅ Cenário 4 - intervalo de datas curto
+    # Cenário 4 - intervalo de datas curto
     ({"data_inicio": tres_dias_atras, "data_fim": hoje.isoformat(), "limit": 5000}, "Intervalo 3 dias", 200),
 
-    # ✅ Cenário 5 - apenas data_inicio
+    # Cenário 5 - apenas data_inicio
     ({"data_inicio": dez_dias_atras}, "Apenas data_inicio", 200),
 
-    # ✅ Cenário 6 - apenas data_fim
+    # Cenário 6 - apenas data_fim
     ({"data_fim": hoje.isoformat()}, "Apenas data_fim", 200),
 
-    # ✅ Cenário 7 - agregação por hora
+    # Cenário 7 - agregação por hora
     ({"agregacao": "hora"}, "Agregação hora", 200),
 
-    # ✅ Cenário 8 - agregação por semana
+    # Cenário 8 - agregação por semana
     ({"agregacao": "semana"}, "Agregação semana", 200),
 
-    # ✅ Cenário 9 - agregação por mês
+    # Cenário 9 - agregação por mês
     ({"agregacao": "mes"}, "Agregação mês", 200),
 
-    # ⚠️ Cenário 10 - lista curta de medidores
+    # Cenário 10 - lista curta de medidores
     ({"medidor_ids": [123, 120, 67, 64]}, "Lista curta de medidores", 200),
 
-    # ⚠️ Cenário 11 - lista longa de medidores
+    # Cenário 11 - lista longa de medidores
     ({"medidor_ids": list(range(1, 51))}, "Lista longa de medidores", 200),
 
-    # ❌ Cenário 12 - medidores inválidos
+    # Cenário 12 - medidores inválidos
     ({"medidor_ids": ["a", "b", "c"]}, "Medidores inválidos", 422),
 
-    # ❌ Cenário 13 - agregação inválida
+    # Cenário 13 - agregação inválida
     ({"agregacao": "ano"}, "Agregação inválida", 422),
 
-    # ❌ Cenário 14 - datas invertidas
+    # Cenário 14 - datas invertidas
     ({"data_inicio": hoje.isoformat(), "data_fim": dez_dias_atras}, "Datas invertidas", 422),
 ]
 
 # ===============================================================
-# 📊 CRIA/INICIALIZA O CSV
+# CRIA/INICIALIZA O CSV
 # ===============================================================
 with open(ARQUIVO_CSV, "w", newline="", encoding="utf-8") as csvfile:
     writer = csv.writer(csvfile)
@@ -91,7 +91,7 @@ with open(ARQUIVO_CSV, "w", newline="", encoding="utf-8") as csvfile:
     ])
 
 # ===============================================================
-# 🧪 TESTE PARAMETRIZADO
+# TESTE PARAMETRIZADO
 # ===============================================================
 @pytest.mark.parametrize("params, descricao, status_esperado", cenarios, ids=[d for _, d, _ in cenarios])
 def test_consumo_temporal(session, params, descricao, status_esperado):

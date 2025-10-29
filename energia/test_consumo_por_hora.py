@@ -5,7 +5,7 @@ import csv
 from datetime import date, timedelta
 
 # ===============================================================
-# 🔧 CONFIGURAÇÕES GERAIS
+# CONFIGURAÇÕES GERAIS
 # ===============================================================
 BASE_URL = "http://172.16.40.100:8025/analise_energia/consumo-por-hora"
 HEADERS = {"accept": "application/json"}
@@ -14,7 +14,7 @@ ARQUIVO_CSV = "csv/energia/consumo_por_hora_resultados.csv"
 LIMITE_TEMPO_MEDIO = 30  # segundos
 
 # ===============================================================
-# 🧰 FIXTURE HTTP SESSION
+# FIXTURE HTTP SESSION
 # ===============================================================
 @pytest.fixture(scope="session")
 def session():
@@ -24,28 +24,28 @@ def session():
     s.close()
 
 # ===============================================================
-# ⚙️ CENÁRIOS DE TESTE
+# CENÁRIOS DE TESTE
 # ===============================================================
 hoje = date.today()
 tres_dias_atras = (hoje - timedelta(days=3)).isoformat()
 dez_dias_atras = (hoje - timedelta(days=10)).isoformat()
 
 cenarios = [
-    # ✅ Cenário 1 - padrão (sem parâmetros)
+    # Cenário 1 - padrão (sem parâmetros)
     ({}, "Sem parâmetros", 200),
 
-    # ⚙️ Cenário 2 - lista curta de medidores
+    # Cenário 2 - lista curta de medidores
     ({"medidor_ids": [1, 2, 3]}, "Lista curta de medidores", 200),
 
-    # ⚙️ Cenário 3 - lista longa de medidores
+    # Cenário 3 - lista longa de medidores
     ({"medidor_ids": list(range(1, 51))}, "Lista longa de medidores", 200),
 
-    # ❌ Cenário 4 - medidores inválidos
+    # Cenário 4 - medidores inválidos
     ({"medidor_ids": ["a", "b", "c"]}, "Medidores inválidos", 422),
 ]
 
 # ===============================================================
-# 📊 CRIA/INICIALIZA O CSV
+# CRIA/INICIALIZA O CSV
 # ===============================================================
 with open(ARQUIVO_CSV, "w", newline="", encoding="utf-8") as csvfile:
     writer = csv.writer(csvfile)
@@ -61,7 +61,7 @@ with open(ARQUIVO_CSV, "w", newline="", encoding="utf-8") as csvfile:
     ])
 
 # ===============================================================
-# 🧪 TESTE PARAMETRIZADO
+# TESTE PARAMETRIZADO
 # ===============================================================
 @pytest.mark.parametrize("params, descricao, status_esperado", cenarios, ids=[d for _, d, _ in cenarios])
 def test_consumo_por_hora(session, params, descricao, status_esperado):
@@ -88,7 +88,7 @@ def test_consumo_por_hora(session, params, descricao, status_esperado):
             break
 
         # ===============================================================
-        # 🧩 Validação do JSON de resposta
+        # Validação do JSON de resposta
         # ===============================================================
         if status_real == 200:
             data = resp.json()
@@ -113,7 +113,7 @@ def test_consumo_por_hora(session, params, descricao, status_esperado):
                     assert isinstance(item["total_leituras"], int), "Campo 'total_leituras' deve ser inteiro"
 
     # ===============================================================
-    # ⏱️ Estatísticas de tempo
+    # Estatísticas de tempo
     # ===============================================================
     media = sum(tempos) / len(tempos)
     menor = min(tempos)
@@ -125,7 +125,7 @@ def test_consumo_por_hora(session, params, descricao, status_esperado):
     print(f"  Média: {media:.3f}s | Mínimo: {menor:.3f}s | Máximo: {maior:.3f}s")
 
     # ===============================================================
-    # 💾 Registro no CSV
+    # Registro no CSV
     # ===============================================================
     with open(ARQUIVO_CSV, "a", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
@@ -141,7 +141,7 @@ def test_consumo_por_hora(session, params, descricao, status_esperado):
         ])
 
     # ===============================================================
-    # ⏱️ Verifica tempo médio
+    # Verifica tempo médio
     # ===============================================================
 
     if status_esperado == 200:

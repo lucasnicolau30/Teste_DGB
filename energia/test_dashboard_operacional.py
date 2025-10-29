@@ -4,7 +4,7 @@ import time
 import csv
 
 # ===============================================================
-# 🔧 CONFIGURAÇÕES GERAIS
+# CONFIGURAÇÕES GERAIS
 # ===============================================================
 BASE_URL = "http://172.16.40.100:8025/analise_energia/dashboard-operacional"
 HEADERS = {"accept": "application/json"}
@@ -13,7 +13,7 @@ ARQUIVO_CSV = "csv/energia/dashboard_operacional_resultados.csv"
 LIMITE_TEMPO_MEDIO = 30  # segundos 
 
 # ===============================================================
-# 🧰 FIXTURE HTTP SESSION
+# FIXTURE HTTP SESSION
 # ===============================================================
 @pytest.fixture(scope="session")
 def session():
@@ -23,15 +23,15 @@ def session():
     s.close()
 
 # ===============================================================
-# ⚙️ CENÁRIOS DE TESTE
+# CENÁRIOS DE TESTE
 # ===============================================================
 cenarios = [
-    # ✅ Cenário 1 - padrão (sem parâmetros)
+    # Cenário 1 - padrão (sem parâmetros)
     ({}, "Sem parâmetros", 200),
 ]
 
 # ===============================================================
-# 📊 CRIA/INICIALIZA O CSV
+# CRIA/INICIALIZA O CSV
 # ===============================================================
 with open(ARQUIVO_CSV, "w", newline="", encoding="utf-8") as csvfile:
     writer = csv.writer(csvfile)
@@ -47,7 +47,7 @@ with open(ARQUIVO_CSV, "w", newline="", encoding="utf-8") as csvfile:
     ])
 
 # ===============================================================
-# 🧪 TESTE PARAMETRIZADO
+# TESTE PARAMETRIZADO
 # ===============================================================
 @pytest.mark.parametrize("params, descricao, status_esperado", cenarios, ids=[d for _, d, _ in cenarios])
 def test_dashboard_operacional(session, params, descricao, status_esperado):
@@ -87,11 +87,11 @@ def test_dashboard_operacional(session, params, descricao, status_esperado):
                 "top_consumidores",
                 "timestamp_atualizacao"
             ]
-            # ✅ Valida presença dos campos
+            # Valida presença dos campos
             for campo in campos_esperados:
                 assert campo in data, f"Campo ausente no JSON: {campo}"
 
-            # ✅ Valida tipos básicos
+            # Valida tipos básicos
             assert isinstance(data["total_medidores"], int)
             assert isinstance(data["consumo_total_dia_kwh"], (int, float))
             assert isinstance(data["custo_total_dia"], (int, float))

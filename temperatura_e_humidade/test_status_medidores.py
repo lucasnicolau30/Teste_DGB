@@ -4,7 +4,7 @@ import time
 import csv
 
 # ===============================================================
-# 🔧 CONFIGURAÇÕES GERAIS
+# CONFIGURAÇÕES GERAIS
 # ===============================================================
 BASE_URL = "http://172.16.40.100:8025/analise_medidores_temp_hum/status-medidores"
 HEADERS = {"accept": "application/json"}
@@ -13,7 +13,7 @@ ARQUIVO_CSV = "csv/temperatura_e_humidade/status_medidores_resultados.csv"
 LIMITE_TEMPO_MEDIO = 30  # segundos
 
 # ===============================================================
-# 🧰 FIXTURE HTTP SESSION
+# FIXTURE HTTP SESSION
 # ===============================================================
 @pytest.fixture(scope="session")
 def session():
@@ -23,14 +23,14 @@ def session():
     s.close()
 
 # ===============================================================
-# ⚙️ CENÁRIOS DE TESTE
+# CENÁRIOS DE TESTE
 # ===============================================================
 cenarios = [
     ({}, "Sem parâmetros", 200),
 ]
 
 # ===============================================================
-# 📊 CRIA/INICIALIZA O CSV
+# CRIA/INICIALIZA O CSV
 # ===============================================================
 with open(ARQUIVO_CSV, "w", newline="", encoding="utf-8") as csvfile:
     writer = csv.writer(csvfile)
@@ -46,7 +46,7 @@ with open(ARQUIVO_CSV, "w", newline="", encoding="utf-8") as csvfile:
     ])
 
 # ===============================================================
-# 🧪 TESTE PARAMETRIZADO
+# TESTE PARAMETRIZADO
 # ===============================================================
 @pytest.mark.parametrize("params, descricao, status_esperado", cenarios, ids=[d for _, d, _ in cenarios])
 def test_status_medidores(session, params, descricao, status_esperado):
@@ -72,11 +72,11 @@ def test_status_medidores(session, params, descricao, status_esperado):
             print(f"❌ Status inesperado: {status_real}, esperado: {status_esperado}")
             break
 
-        # ✅ Validação do corpo JSON se status = 200
+        # Validação do corpo JSON se status = 200
         if status_real == 200:
             data = resp.json()
 
-            # ✅ Deve ser uma lista
+            # Deve ser uma lista
             assert isinstance(data, list), f"Retorno esperado: lista, recebido: {type(data)}"
             assert len(data) > 0, "Lista retornada está vazia"
 
@@ -89,13 +89,13 @@ def test_status_medidores(session, params, descricao, status_esperado):
                 "ultima_umidade_percent"
             ]
 
-            # ✅ Valida estrutura dos primeiros 5 itens
+            # Valida estrutura dos primeiros 5 itens
             for idx, item in enumerate(data[:5]):
                 assert isinstance(item, dict), f"Item {idx} não é um objeto JSON"
                 for campo in campos_esperados:
                     assert campo in item, f"Campo ausente no item {idx}: {campo}"
 
-                # ✅ Tipagem esperada
+                # Tipagem esperada
                 assert isinstance(item["medidor_id"], int)
                 assert isinstance(item["medidor"], str)
                 assert isinstance(item["ultima_leitura"], str)
@@ -103,13 +103,13 @@ def test_status_medidores(session, params, descricao, status_esperado):
                 assert isinstance(item["ultima_temperatura_c"], (int, float))
                 assert isinstance(item["ultima_umidade_percent"], (int, float))
 
-                # ✅ Validações lógicas básicas
+                # Validações lógicas básicas
                 assert item["dias_sem_dados"] >= 0, f"Dias sem dados inválido no item {idx}"
                 assert -100 <= item["ultima_temperatura_c"] <= 100, f"Temperatura fora do intervalo plausível no item {idx}"
                 assert 0 <= item["ultima_umidade_percent"] <= 100, f"Umidade fora do intervalo (0 a 100%) no item {idx}"
 
     # ============================================================
-    # 📈 Estatísticas de tempo
+    # Estatísticas de tempo
     # ============================================================
     media = sum(tempos) / len(tempos)
     menor = min(tempos)
@@ -121,7 +121,7 @@ def test_status_medidores(session, params, descricao, status_esperado):
     print(f"  Média: {media:.3f}s | Mínimo: {menor:.3f}s | Máximo: {maior:.3f}s")
 
     # ============================================================
-    # 🧾 Salva no CSV
+    # Salva no CSV
     # ============================================================
     with open(ARQUIVO_CSV, "a", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
@@ -137,7 +137,7 @@ def test_status_medidores(session, params, descricao, status_esperado):
         ])
 
     # ============================================================
-    # ⏱️ Valida tempo médio
+    # Valida tempo médio
     # ============================================================
     if status_esperado == 200:
         assert media < LIMITE_TEMPO_MEDIO, f"Tempo médio alto ({media:.2f}s) em {descricao}"

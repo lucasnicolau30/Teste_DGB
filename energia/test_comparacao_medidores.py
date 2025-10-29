@@ -5,16 +5,16 @@ import csv
 from datetime import date, timedelta
 
 # ===============================================================
-# 🔧 CONFIGURAÇÕES GERAIS
+# CONFIGURAÇÕES GERAIS
 # ===============================================================
 BASE_URL = "http://172.16.40.100:8025/analise_energia/comparacao-medidores"
 HEADERS = {"accept": "application/json"}
 REPETICOES = 5
 ARQUIVO_CSV = "csv/energia/comparacao_performance_medidores_resultados.csv"
-LIMITE_TEMPO_MEDIO = 30  # segundos (ajuste conforme seu ambiente)
+LIMITE_TEMPO_MEDIO = 30  # segundos
 
 # ===============================================================
-# 🧰 FIXTURE HTTP SESSION
+# FIXTURE HTTP SESSION
 # ===============================================================
 @pytest.fixture(scope="session")
 def session():

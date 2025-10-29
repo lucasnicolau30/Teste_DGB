@@ -6,7 +6,7 @@ import os
 from datetime import date, timedelta
 
 # ===============================================================
-# 🔧 CONFIGURAÇÕES GERAIS
+# CONFIGURAÇÕES GERAIS
 # ===============================================================
 BASE_URL = "http://172.16.40.100:8025/analise_energia/analise-fator-potencia"
 HEADERS = {"accept": "application/json"}
@@ -15,7 +15,7 @@ ARQUIVO_CSV = "csv/energia/analise_fator_potencia_resultados.csv"
 LIMITE_TEMPO_MEDIO = 30  # segundos
 
 # ===============================================================
-# 🧰 FIXTURE HTTP SESSION
+# FIXTURE HTTP SESSION
 # ===============================================================
 @pytest.fixture(scope="session")
 def session():
@@ -25,46 +25,46 @@ def session():
     s.close()
 
 # ===============================================================
-# ⚙️ CENÁRIOS DE TESTE
+# CENÁRIOS DE TESTE
 # ===============================================================
 hoje = date.today()
 tres_dias_atras = (hoje - timedelta(days=3)).isoformat()
 dez_dias_atras = (hoje - timedelta(days=10)).isoformat()
 
 cenarios = [
-    # ✅ Cenário 1 - padrão (sem parâmetros)
+    # Cenário 1 - padrão (sem parâmetros)
     ({}, "Sem parâmetros", 200),
 
-    # ✅ Cenário 2 - limit pequeno
+    # Cenário 2 - limit pequeno
     ({"limit": 10}, "Limit 10", 200),
 
-    # ✅ Cenário 3 - limit grande
+    # Cenário 3 - limit grande
     ({"limit": 100000}, "Limit 100000", 200),
 
-    # ✅ Cenário 4 - intervalo de datas curto
+    # Cenário 4 - intervalo de datas curto
     ({"data_inicio": tres_dias_atras, "data_fim": hoje.isoformat()}, "Intervalo 3 dias", 200),
 
-    # ✅ Cenário 5 - apenas data_inicio
+    # Cenário 5 - apenas data_inicio
     ({"data_inicio": dez_dias_atras}, "Apenas data_inicio", 200),
 
-    # ✅ Cenário 6 - apenas data_fim
+    # Cenário 6 - apenas data_fim
     ({"data_fim": hoje.isoformat()}, "Apenas data_fim", 200),
 
-    # ⚠️ Cenário 7 - lista curta de medidores
+    # Cenário 7 - lista curta de medidores
     ({"medidor_ids": [123, 120, 67, 64]}, "Lista curta de medidores", 200),
 
-    # ⚠️ Cenário 8 - lista longa de medidores
+    # Cenário 8 - lista longa de medidores
     ({"medidor_ids": list(range(1, 51))}, "Lista longa de medidores", 200),
 
-    # ❌ Cenário 9 - medidores inválidos
+    # Cenário 9 - medidores inválidos
     ({"medidor_ids": ["a", "b", "c"]}, "Medidores inválidos", 422),
 
-    # ❌ Cenário 10 - datas invertidas
+    # Cenário 10 - datas invertidas
     ({"data_inicio": hoje.isoformat(), "data_fim": dez_dias_atras}, "Datas invertidas", 422),
 ]
 
 # ===============================================================
-# 📊 CRIA/INICIALIZA O CSV
+# CRIA/INICIALIZA O CSV
 # ===============================================================
 os.makedirs("csv/energia", exist_ok=True)
 
@@ -82,7 +82,7 @@ with open(ARQUIVO_CSV, "w", newline="", encoding="utf-8") as csvfile:
     ])
 
 # ===============================================================
-# 🧪 TESTE PARAMETRIZADO
+# TESTE PARAMETRIZADO
 # ===============================================================
 @pytest.mark.parametrize("params, descricao, status_esperado", cenarios, ids=[d for _, d, _ in cenarios])
 def test_analise_fator_potencia(session, params, descricao, status_esperado):
@@ -125,7 +125,7 @@ def test_analise_fator_potencia(session, params, descricao, status_esperado):
                     ]:
                         assert campo in item, f"Campo ausente no JSON: {campo}"
 
-                    # ✅ Regras de validação numérica com tolerância ampla
+                    # Regras de validação numérica com tolerância ampla
                     assert 0 <= item["hora"] <= 23, f"Hora inválida: {item['hora']}"
                     assert -5 <= item["fp_medio"] <= 10, f"fp_medio fora do intervalo esperado (-5 a 10)"
                     assert -5 <= item["fp_min"] <= 10, f"fp_min fora do intervalo esperado (-5 a 10)"
@@ -133,7 +133,7 @@ def test_analise_fator_potencia(session, params, descricao, status_esperado):
                     assert 0 <= item["percentual_abaixo_ideal"] <= 100, "Percentual fora do intervalo (0-100)"
 
     # ===============================================================
-    # 📈 Estatísticas de tempo e escrita no CSV
+    # Estatísticas de tempo e escrita no CSV
     # ===============================================================
     media = sum(tempos) / len(tempos)
     menor = min(tempos)
@@ -158,7 +158,7 @@ def test_analise_fator_potencia(session, params, descricao, status_esperado):
         ])
 
     # ===============================================================
-    # ⏱️ Verifica limite de tempo médio
+    # Verifica limite de tempo médio
     # ===============================================================
     if status_esperado == 200:
         assert media < LIMITE_TEMPO_MEDIO, f"Tempo médio alto ({media:.2f}s) em {descricao}"

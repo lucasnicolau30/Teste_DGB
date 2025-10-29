@@ -1,0 +1,2 @@
+Cenário,Parâmetros,Status Esperado,Status Real,Tempo Médio (s),Tempo Mínimo (s),Tempo Máximo (s),Sucesso
+Acesso ao endpoint raiz,{},200,200,0.305,0.279,0.406,OK

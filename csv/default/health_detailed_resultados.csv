@@ -1,0 +1,2 @@
+Cenário,Parâmetros,Status Esperado,Status Real,Tempo Médio (s),Tempo Mínimo (s),Tempo Máximo (s),Sucesso
+Health check detalhado com status dos bancos DuckDB,{},200,200,0.327,0.296,0.432,OK

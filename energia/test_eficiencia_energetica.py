@@ -4,7 +4,7 @@ import time
 import csv
 
 # ===============================================================
-# 🔧 CONFIGURAÇÕES GERAIS
+# CONFIGURAÇÕES GERAIS
 # ===============================================================
 BASE_URL = "http://172.16.40.100:8025/analise_energia/eficiencia-energetica"
 HEADERS = {"accept": "application/json"}
@@ -13,7 +13,7 @@ ARQUIVO_CSV = "csv/energia/eficiencia_energetica_resultados.csv"
 LIMITE_TEMPO_MEDIO = 30  # segundos 
 
 # ===============================================================
-# 🧰 FIXTURE HTTP SESSION
+# FIXTURE HTTP SESSION
 # ===============================================================
 @pytest.fixture(scope="session")
 def session():
@@ -23,15 +23,15 @@ def session():
     s.close()
 
 # ===============================================================
-# ⚙️ CENÁRIOS DE TESTE
+# CENÁRIOS DE TESTE
 # ===============================================================
 cenarios = [
-    # ✅ Cenário 1 - padrão (sem parâmetros)
+    # Cenário 1 - padrão (sem parâmetros)
     ({}, "Sem parâmetros", 200),
 ]
 
 # ===============================================================
-# 📊 CRIA/INICIALIZA O CSV
+# CRIA/INICIALIZA O CSV
 # ===============================================================
 with open(ARQUIVO_CSV, "w", newline="", encoding="utf-8") as csvfile:
     writer = csv.writer(csvfile)
@@ -47,7 +47,7 @@ with open(ARQUIVO_CSV, "w", newline="", encoding="utf-8") as csvfile:
     ])
 
 # ===============================================================
-# 🧪 TESTE PARAMETRIZADO
+# TESTE PARAMETRIZADO
 # ===============================================================
 @pytest.mark.parametrize("params, descricao, status_esperado", cenarios, ids=[d for _, d, _ in cenarios])
 def test_eficiencia_energetica(session, params, descricao, status_esperado):
@@ -73,7 +73,7 @@ def test_eficiencia_energetica(session, params, descricao, status_esperado):
             print(f"❌ Status inesperado: {status_real}, esperado: {status_esperado}")
             break
 
-        # ✅ Se for 200, valida estrutura do JSON (lista de objetos)
+        # Se for 200, valida estrutura do JSON (lista de objetos)
         if status_real == 200:
             data = resp.json()
             assert isinstance(data, list), f"Retorno esperado: lista, recebido: {type(data)}"
@@ -89,13 +89,13 @@ def test_eficiencia_energetica(session, params, descricao, status_esperado):
                 "classificacao"
             ]
 
-            # ✅ Valida os 5 primeiros itens para performance
+            # Valida os 5 primeiros itens para performance
             for idx, item in enumerate(data[:5]):
                 assert isinstance(item, dict), f"Item {idx} não é um objeto JSON"
                 for campo in campos_esperados:
                     assert campo in item, f"Campo ausente no item {idx}: {campo}"
 
-                # ✅ Valida tipos básicos
+                # Valida tipos básicos
                 assert isinstance(item["medidor_descricao"], str)
                 assert isinstance(item["fator_potencia_medio"], (int, float))
                 assert isinstance(item["fator_potencia_ideal"], (int, float))
@@ -106,7 +106,7 @@ def test_eficiencia_energetica(session, params, descricao, status_esperado):
                 assert isinstance(item["classificacao"], str)
 
     # ===============================================================
-    # 📊 Estatísticas de tempo
+    # Estatísticas de tempo
     # ===============================================================
     media = sum(tempos) / len(tempos)
     menor = min(tempos)
@@ -118,7 +118,7 @@ def test_eficiencia_energetica(session, params, descricao, status_esperado):
     print(f"  Média: {media:.3f}s | Mínimo: {menor:.3f}s | Máximo: {maior:.3f}s")
 
     # ===============================================================
-    # 💾 Salva no CSV
+    # Salva no CSV
     # ===============================================================
     with open(ARQUIVO_CSV, "a", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
@@ -134,7 +134,7 @@ def test_eficiencia_energetica(session, params, descricao, status_esperado):
         ])
 
     # ===============================================================
-    # ⏱️ Verifica tempo médio
+    # Verifica tempo médio
     # ===============================================================
     if status_esperado == 200:
         assert media < LIMITE_TEMPO_MEDIO, f"Tempo médio alto ({media:.2f}s) em {descricao}"

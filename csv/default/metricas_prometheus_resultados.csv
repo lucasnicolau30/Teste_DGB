@@ -1,0 +1,2 @@
+Cenário,Parâmetros,Status Esperado,Status Real,Tempo Médio (s),Tempo Mínimo (s),Tempo Máximo (s),Sucesso
+Métricas Prometheus expostas corretamente,{},200,200,0.289,0.248,0.400,Sim

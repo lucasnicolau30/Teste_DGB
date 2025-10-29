@@ -1,0 +1,2 @@
+Cenário,Parâmetros,Status Esperado,Status Real,Tempo Médio (s),Tempo Mínimo (s),Tempo Máximo (s),Sucesso
+Health check básico do serviço,{},200,200,0.317,0.283,0.44,OK

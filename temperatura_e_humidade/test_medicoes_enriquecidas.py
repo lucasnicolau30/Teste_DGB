@@ -5,7 +5,7 @@ import csv
 from datetime import datetime, timedelta
 
 # ===============================================================
-# 🔧 CONFIGURAÇÕES GERAIS
+# CONFIGURAÇÕES GERAIS
 # ===============================================================
 BASE_URL = "http://172.16.40.100:8025/analise_medidores_temp_hum/medicoes-enriquecidas"
 HEADERS = {"accept": "application/json"}
@@ -14,7 +14,7 @@ ARQUIVO_CSV = "csv/temperatura_e_humidade/medicoes_enriquecidas_resultados.csv"
 LIMITE_TEMPO_MEDIO = 30  # segundos
 
 # ===============================================================
-# 🧰 FIXTURE HTTP SESSION
+# FIXTURE HTTP SESSION
 # ===============================================================
 @pytest.fixture(scope="session")
 def session():
@@ -24,47 +24,47 @@ def session():
     s.close()
 
 # ===============================================================
-# ⚙️ CENÁRIOS DE TESTE
+# CENÁRIOS DE TESTE
 # ===============================================================
 hoje = datetime.now()
 tres_dias_atras = hoje - timedelta(days=3)
 dez_dias_atras = hoje - timedelta(days=10)
 
 cenarios = [
-    # ✅ Cenário 1 - Sem parâmetros
+    # Cenário 1 - Sem parâmetros
     ({}, "Sem parâmetros", 200),
 
-    # ✅ Cenário 2 - tipo_sensor AMBIENTE
+    # Cenário 2 - tipo_sensor AMBIENTE
     ({"tipo_sensor": "AMBIENTE"}, "Tipo sensor AMBIENTE", 200),
 
-    # ✅ Cenário 3 - tipo_sensor FREEZER
+    # Cenário 3 - tipo_sensor FREEZER
     ({"tipo_sensor": "FREEZER"}, "Tipo sensor FREEZER", 200),
 
-    # ✅ Cenário 4 - Apenas data_inicio
+    # Cenário 4 - Apenas data_inicio
     ({"data_inicio": dez_dias_atras.isoformat()}, "Apenas data_inicio", 200),
 
-    # ✅ Cenário 5 - Apenas data_fim
+    # Cenário 5 - Apenas data_fim
     ({"data_fim": hoje.isoformat()}, "Apenas data_fim", 200),
 
-    # ✅ Cenário 6 - Intervalo curto (3 dias)
+    # Cenário 6 - Intervalo curto (3 dias)
     ({"data_inicio": tres_dias_atras.isoformat(), "data_fim": hoje.isoformat()}, "Intervalo de 3 dias", 200),
 
-    # ✅ Cenário 7 - Limit pequeno
+    # Cenário 7 - Limit pequeno
     ({"limit": 10}, "Limit 10", 200),
 
-    # ✅ Cenário 8 - Limit máximo permitido
+    # Cenário 8 - Limit máximo permitido
     ({"limit": 1000}, "Limit 1000", 200),
 
-    # ✅ Cenário 9 - Apenas anomalias = true
+    # Cenário 9 - Apenas anomalias = true
     ({"apenas_anomalias": True}, "Apenas anomalias", 200),
 
-    # ✅ Cenário 10 - Filtro por medidor_ids simples
+    # Cenário 10 - Filtro por medidor_ids simples
     ({"medidor_ids": [123, 120, 67, 64]}, "Lista curta de medidores", 200),
 
-    # ✅ Cenário 11 - Filtro com offset
+    # Cenário 11 - Filtro com offset
     ({"limit": 20, "offset": 5}, "Limit 20 + Offset 5", 200),
 
-    # ✅ Cenário 12 - Combinação completa
+    # Cenário 12 - Combinação completa
     ({
         "tipo_sensor": "AMBIENTE",
         "data_inicio": tres_dias_atras.isoformat(),
@@ -75,18 +75,18 @@ cenarios = [
         "medidor_ids": [123, 120, 67, 64]
     }, "Cenário completo", 200),
 
-    # ❌ Cenário 13 - tipo_sensor inválido
+    # Cenário 13 - tipo_sensor inválido
     ({"tipo_sensor": "INVALIDO"}, "Tipo sensor inválido", 422),
 
-    # ❌ Cenário 14 - Datas invertidas
+    # Cenário 14 - Datas invertidas
     ({"data_inicio": hoje.isoformat(), "data_fim": dez_dias_atras.isoformat()}, "Datas invertidas", 422),
 
-    # ❌ Cenário 15 - medidor_ids inválido
+    # Cenário 15 - medidor_ids inválido
     ({"medidor_ids": ["a", "b", "c"]}, "Medidores inválidos", 422),
 ]
 
 # ===============================================================
-# 📊 CRIA/INICIALIZA O CSV
+# CRIA/INICIALIZA O CSV
 # ===============================================================
 with open(ARQUIVO_CSV, "w", newline="", encoding="utf-8") as csvfile:
     writer = csv.writer(csvfile)
@@ -102,7 +102,7 @@ with open(ARQUIVO_CSV, "w", newline="", encoding="utf-8") as csvfile:
     ])
 
 # ===============================================================
-# 🧪 TESTE PARAMETRIZADO
+# TESTE PARAMETRIZADO
 # ===============================================================
 @pytest.mark.parametrize("params, descricao, status_esperado", cenarios, ids=[d for _, d, _ in cenarios])
 def test_medicoes_enriquecidas(session, params, descricao, status_esperado):
@@ -128,7 +128,7 @@ def test_medicoes_enriquecidas(session, params, descricao, status_esperado):
             print(f"❌ Status inesperado: {status_real}, esperado: {status_esperado}")
             break
 
-        # ✅ Se retorno for 200, valida estrutura JSON
+        # Se retorno for 200, valida estrutura JSON
         if status_real == 200:
             data = resp.json()
             assert isinstance(data, list), f"Retorno esperado: lista, recebido: {type(data)}"
@@ -150,7 +150,7 @@ def test_medicoes_enriquecidas(session, params, descricao, status_esperado):
                 for campo in campos_esperados:
                     assert campo in item, f"Campo ausente: {campo}"
 
-                # ✅ Tipos básicos
+                # Tipos básicos
                 assert isinstance(item["data_leitura"], str)
                 assert isinstance(item["medidor_id"], int)
                 assert isinstance(item["temperatura"], (int, float))
@@ -161,7 +161,7 @@ def test_medicoes_enriquecidas(session, params, descricao, status_esperado):
                 assert isinstance(item["anomalia_alvo"], (int, float, bool))
 
     # ===============================================================
-    # 📊 Estatísticas de tempo
+    # Estatísticas de tempo
     # ===============================================================
     media = sum(tempos) / len(tempos)
     menor = min(tempos)
@@ -173,7 +173,7 @@ def test_medicoes_enriquecidas(session, params, descricao, status_esperado):
     print(f"  Média: {media:.3f}s | Mínimo: {menor:.3f}s | Máximo: {maior:.3f}s")
 
     # ===============================================================
-    # 💾 Salva no CSV
+    # Salva no CSV
     # ===============================================================
     with open(ARQUIVO_CSV, "a", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
@@ -189,7 +189,7 @@ def test_medicoes_enriquecidas(session, params, descricao, status_esperado):
         ])
 
     # ===============================================================
-    # ⏱️ Verifica tempo médio
+    # Verifica tempo médio
     # ===============================================================
     if status_esperado == 200:
         assert media < LIMITE_TEMPO_MEDIO, f"Tempo médio alto ({media:.2f}s) em {descricao}"

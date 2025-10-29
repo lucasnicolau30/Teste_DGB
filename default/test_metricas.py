@@ -2,14 +2,15 @@ import pytest
 import requests
 import time
 import csv
+import re
 
 # ===============================================================
 # CONFIGURAÇÕES GERAIS
 # ===============================================================
-BASE_URL = "http://172.16.40.100:8025/analise_medidores_temp_hum/dashboard-operacional"
+BASE_URL = "http://172.16.40.100:8025/metricas"
 HEADERS = {"accept": "application/json"}
 REPETICOES = 5
-ARQUIVO_CSV = "csv/temperatura_e_humidade/dashboard_operacional_temp_hum_resultados.csv"
+ARQUIVO_CSV = "csv/default/metricas_prometheus_resultados.csv"
 LIMITE_TEMPO_MEDIO = 30  # segundos
 
 # ===============================================================
@@ -26,7 +27,7 @@ def session():
 # CENÁRIOS DE TESTE
 # ===============================================================
 cenarios = [
-    ({}, "Sem parâmetros", 200),
+    ({}, "Métricas Prometheus expostas corretamente", 200),
 ]
 
 # ===============================================================
@@ -49,7 +50,7 @@ with open(ARQUIVO_CSV, "w", newline="", encoding="utf-8") as csvfile:
 # TESTE PARAMETRIZADO
 # ===============================================================
 @pytest.mark.parametrize("params, descricao, status_esperado", cenarios, ids=[d for _, d, _ in cenarios])
-def test_dashboard_operacional_temp_hum(session, params, descricao, status_esperado):
+def test_metricas_prometheus(session, params, descricao, status_esperado):
     tempos = []
     sucesso = True
     status_real = None
@@ -59,8 +60,9 @@ def test_dashboard_operacional_temp_hum(session, params, descricao, status_esper
 
     for i in range(REPETICOES):
         inicio = time.perf_counter()
-        resp = session.get(BASE_URL, params=params)
+        resp = session.get(BASE_URL, params=params, timeout=10)
         fim = time.perf_counter()
+
         duracao = fim - inicio
         tempos.append(duracao)
         status_real = resp.status_code
@@ -72,63 +74,51 @@ def test_dashboard_operacional_temp_hum(session, params, descricao, status_esper
             print(f"❌ Status inesperado: {status_real}, esperado: {status_esperado}")
             break
 
-        # Validação do corpo JSON se status = 200
+        # Validação do formato Prometheus
         if status_real == 200:
-            data = resp.json()
+            texto = resp.text.strip()
 
-            campos_esperados = [
-                "total_medidores",
-                "medidores_ativos",
-                "total_leituras_hoje",
-                "total_anomalias_hoje",
-                "temperatura_media_geral",
-                "medidores_com_alerta",
-                "timestamp_atualizacao"
-            ]
+            # Corrige escape de JSON — converte texto "\n" em quebras reais
+            if texto.startswith('"') and texto.endswith('"'):
+                texto = texto[1:-1]  # remove aspas externas
+            texto = texto.encode('utf-8').decode('unicode_escape')
 
-            # Valida presença dos campos
-            for campo in campos_esperados:
-                assert campo in data, f"Campo ausente no JSON: {campo}"
+            # Deve conter cabeçalhos típicos de métricas
+            assert "# HELP" in texto, "Saída Prometheus deve conter '# HELP'"
+            assert "# TYPE" in texto, "Saída Prometheus deve conter '# TYPE'"
 
-            # Valida tipos dos campos principais
-            assert isinstance(data["total_medidores"], int)
-            assert isinstance(data["medidores_ativos"], int)
-            assert isinstance(data["total_leituras_hoje"], int)
-            assert isinstance(data["total_anomalias_hoje"], int)
-            assert isinstance(data["temperatura_media_geral"], (int, float))
-            assert isinstance(data["medidores_com_alerta"], list)
-            assert isinstance(data["timestamp_atualizacao"], str)
+            # Deve conter pelo menos uma métrica válida
+            padrao = r'^[a-zA-Z_:][a-zA-Z0-9_:]*\{?.*?\}?\s+[0-9eE+.\-]+$'
+            assert re.search(padrao, texto, re.MULTILINE), "Nenhuma métrica Prometheus válida encontrada"
+
+            # Deve conter métricas conhecidas
+            assert "api_requests_total" in texto, "Métrica 'api_requests_total' ausente"
+            assert "api_request_duration_seconds" in texto, "Métrica 'api_request_duration_seconds' ausente"
 
     # ============================================================
-    # Estatísticas de tempo
+    # Estatísticas e escrita do CSV
     # ============================================================
-    media = sum(tempos) / len(tempos)
-    menor = min(tempos)
-    maior = max(tempos)
+    tempo_medio = sum(tempos) / len(tempos)
+    tempo_min = min(tempos)
+    tempo_max = max(tempos)
 
-    print(f"\nResultados — {descricao}")
-    print(f"  Status Esperado: {status_esperado}")
-    print(f"  Status Real: {status_real}")
-    print(f"  Média: {media:.3f}s | Mínimo: {menor:.3f}s | Máximo: {maior:.3f}s")
+    print(f"\n Tempo médio: {tempo_medio:.3f}s (mín: {tempo_min:.3f}s, máx: {tempo_max:.3f}s)")
+    print(f"✅ Sucesso: {sucesso}")
 
-    # ============================================================
-    # Salva no CSV
-    # ============================================================
+    # Escreve no CSV
     with open(ARQUIVO_CSV, "a", newline="", encoding="utf-8") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow([
             descricao,
-            str(params),
+            params,
             status_esperado,
             status_real,
-            round(media, 3),
-            round(menor, 3),
-            round(maior, 3),
-            "OK" if sucesso else "FALHA"
+            f"{tempo_medio:.3f}",
+            f"{tempo_min:.3f}",
+            f"{tempo_max:.3f}",
+            "Sim" if sucesso else "Não"
         ])
 
-    # ============================================================
     # Valida tempo médio
-    # ============================================================
-    if status_esperado == 200:
-        assert media < LIMITE_TEMPO_MEDIO, f"Tempo médio alto ({media:.2f}s) em {descricao}"
+    assert tempo_medio < LIMITE_TEMPO_MEDIO, f"Tempo médio acima do limite ({LIMITE_TEMPO_MEDIO}s)"
+    assert sucesso, f"Falha no cenário: {descricao}"
